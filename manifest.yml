@@ -1,0 +1,25 @@
+---
+applications:
+- name: iflow-processor-api
+  memory: 512M
+  disk_quota: 2G
+  instances: 1
+  buildpacks:
+    - python_buildpack
+  command: gunicorn --config gunicorn.conf.py app:app
+  env:
+    FLASK_ENV: production
+    PYTHONUNBUFFERED: 1
+    # Extended timeouts for long processing (30 minutes)
+    GUNICORN_TIMEOUT: 1800
+    FLASK_TIMEOUT: 1800
+    # API Keys - These must be set as environment variables before deployment
+    # Use: cf set-env iflow-processor-api OPENAI_API_KEY "your_key"
+    # Use: cf set-env iflow-processor-api SUPABASE_URL "your_url"
+    # Use: cf set-env iflow-processor-api SUPABASE_KEY "your_key"
+  # services:
+    # - iflow-secrets  # No longer needed - using direct env vars
+  # routes:
+    # - route: iflow-processor-api.cfapps.us10-001.hana.ondemand.com
+  health-check-type: process
+  timeout: 600   # 10 minutes (Cloud Foundry maximum)
