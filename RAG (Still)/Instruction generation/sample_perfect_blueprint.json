@@ -1,0 +1,183 @@
+{
+  "package_info": {
+    "package_id": "iflow_a1b2c3d4",
+    "package_name": "sync_sap_s4hana_employee_validation",
+    "description": "Sync integration from sap_s4hana to successfactors for employee data with validation, transformation. Generated from real iFlow components and assets using intelligent analysis.",
+    "version": "1.0.0",
+    "generated_timestamp": "2025-01-20 14:30:45",
+    "integration_type": "sync",
+    "complexity_level": "medium",
+    "source_systems": ["sap_s4hana"],
+    "target_systems": ["successfactors"],
+    "data_types": ["employee"]
+  },
+  "iflow_definition": {
+    "iflow_id": "iflow_a1b2c3d4_main",
+    "iflow_name": "sync_sap_s4hana_employee_validation",
+    "description": "Create a sync integration to transfer employee data from SAP S/4HANA to SuccessFactors with validation and error handling",
+    "bpmn_structure": {
+      "start_events": [],
+      "activities": [
+        {
+          "id": "ContentModifier_1",
+          "name": "Set Employee Context",
+          "type": "contentmodifier",
+          "properties": {
+            "activityType": "ContentModifier",
+            "componentVersion": "1.2",
+            "cmdVariantUri": "ctype::FlowstepVariant/cname::ContentModifier/version::1.2.1"
+          },
+          "bpmn_xml": "<callActivity id=\"ContentModifier_1\" name=\"Set Employee Context\">\n    <extensionElements>\n        <ifl:property>\n            <key>activityType</key>\n            <value>ContentModifier</value>\n        </ifl:property>\n        <ifl:property>\n            <key>componentVersion</key>\n            <value>1.2</value>\n        </ifl:property>\n    </extensionElements>\n</callActivity>",
+          "description": "Content modifier to set employee processing context and headers",
+          "relevance_score": 0.95,
+          "match_reasons": ["Activity type match: enricher", "Description relevance"],
+          "is_essential": true
+        },
+        {
+          "id": "Script_ValidationLogic",
+          "name": "Validate Employee Data",
+          "type": "script",
+          "properties": {
+            "activityType": "Script",
+            "componentVersion": "1.1",
+            "scriptType": "groovy"
+          },
+          "bpmn_xml": "<callActivity id=\"Script_ValidationLogic\" name=\"Validate Employee Data\">\n    <extensionElements>\n        <ifl:property>\n            <key>activityType</key>\n            <value>Script</value>\n        </ifl:property>\n        <ifl:property>\n            <key>scriptType</key>\n            <value>groovy</value>\n        </ifl:property>\n    </extensionElements>\n</callActivity>",
+          "description": "Groovy script for comprehensive employee data validation including mandatory fields, format checks, and business rules",
+          "relevance_score": 0.92,
+          "match_reasons": ["Activity type match: script", "Business logic match"],
+          "is_essential": true
+        },
+        {
+          "id": "RequestReply_S4HANA",
+          "name": "Call SAP S/4HANA Employee API",
+          "type": "requestreply",
+          "properties": {
+            "activityType": "RequestReply",
+            "componentVersion": "1.3",
+            "httpMethod": "POST",
+            "endpoint": "/api/employees"
+          },
+          "bpmn_xml": "<callActivity id=\"RequestReply_S4HANA\" name=\"Call SAP S/4HANA Employee API\">\n    <extensionElements>\n        <ifl:property>\n            <key>activityType</key>\n            <value>RequestReply</value>\n        </ifl:property>\n        <ifl:property>\n            <key>httpMethod</key>\n            <value>POST</value>\n        </ifl:property>\n    </extensionElements>\n</callActivity>",
+          "description": "Request-Reply component for calling SAP S/4HANA Employee API with authentication and error handling",
+          "relevance_score": 0.88,
+          "match_reasons": ["Activity type match: request_reply", "System integration match"],
+          "is_essential": true
+        },
+        {
+          "id": "MessageMapping_Transform",
+          "name": "Transform Employee Data",
+          "type": "messagemapping",
+          "properties": {
+            "activityType": "MessageMapping",
+            "componentVersion": "1.2",
+            "mappingType": "operation"
+          },
+          "bpmn_xml": "<callActivity id=\"MessageMapping_Transform\" name=\"Transform Employee Data\">\n    <extensionElements>\n        <ifl:property>\n            <key>activityType</key>\n            <value>MessageMapping</value>\n        </ifl:property>\n        <ifl:property>\n            <key>mappingType</key>\n            <value>operation</value>\n        </ifl:property>\n    </extensionElements>\n</callActivity>",
+          "description": "Message mapping for transforming employee data from S/4HANA format to SuccessFactors format",
+          "relevance_score": 0.85,
+          "match_reasons": ["Activity type match: message_mapping", "Business logic match"],
+          "is_essential": false
+        }
+      ],
+      "gateways": [
+        {
+          "id": "ExclusiveGateway_ErrorCheck",
+          "name": "Validation Success?",
+          "type": "exclusivegateway",
+          "properties": {
+            "activityType": "ExclusiveGateway",
+            "componentVersion": "1.1",
+            "default": "SequenceFlow_Success"
+          },
+          "bpmn_xml": "<exclusiveGateway id=\"ExclusiveGateway_ErrorCheck\" name=\"Validation Success?\" default=\"SequenceFlow_Success\">\n    <extensionElements>\n        <ifl:property>\n            <key>activityType</key>\n            <value>ExclusiveGateway</value>\n        </ifl:property>\n    </extensionElements>\n</exclusiveGateway>",
+          "description": "Exclusive gateway for routing based on validation results",
+          "relevance_score": 0.78,
+          "match_reasons": ["Activity type match: gateway", "Error handling match"],
+          "is_essential": false
+        }
+      ],
+      "end_events": [],
+      "total_components": 5
+    },
+    "flow_sequence": [
+      "StartEvent_1",
+      "ContentModifier_1",
+      "Script_ValidationLogic",
+      "ExclusiveGateway_ErrorCheck",
+      "MessageMapping_Transform",
+      "RequestReply_S4HANA",
+      "EndEvent_1"
+    ],
+    "integration_pattern": "sync",
+    "complexity_assessment": "medium"
+  },
+  "package_assets": {
+    "bpmn_files": [],
+    "groovy_scripts": [
+      {
+        "file_name": "employee_validation.groovy",
+        "description": "Comprehensive employee data validation script with business rules",
+        "content": "import com.sap.gateway.ip.core.customdev.util.Message;\n\ndef Message processData(Message message) {\n    def body = message.getBody(java.lang.String);\n    def employee = new groovy.json.JsonSlurper().parseText(body);\n    \n    // Validate mandatory fields\n    if (!employee.employeeId) {\n        throw new Exception('Missing employee ID');\n    }\n    \n    if (!employee.firstName || !employee.lastName) {\n        throw new Exception('Missing employee name');\n    }\n    \n    // Business rule validation\n    if (employee.hireDate && new Date(employee.hireDate) > new Date()) {\n        throw new Exception('Invalid hire date: cannot be in future');\n    }\n    \n    message.setProperty('ValidationStatus', 'SUCCESS');\n    return message;\n}",
+        "relevance_score": 0.93,
+        "source": "supabase_intelligent_selection",
+        "script_type": "processing"
+      }
+    ],
+    "message_mappings": [
+      {
+        "file_name": "s4hana_to_successfactors_employee.mmap",
+        "description": "Employee data mapping from SAP S/4HANA to SuccessFactors format",
+        "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<mapping:Mapping xmlns:mapping=\"http://www.sap.com/xi/mapping\">\n    <mapping:Source>\n        <mapping:Schema namespace=\"http://sap.com/s4hana/employee\"/>\n    </mapping:Source>\n    <mapping:Target>\n        <mapping:Schema namespace=\"http://successfactors.com/employee\"/>\n    </mapping:Target>\n    <mapping:Rules>\n        <mapping:Rule source=\"employeeId\" target=\"externalCode\"/>\n        <mapping:Rule source=\"firstName\" target=\"firstName\"/>\n        <mapping:Rule source=\"lastName\" target=\"lastName\"/>\n    </mapping:Rules>\n</mapping:Mapping>",
+        "relevance_score": 0.89,
+        "source": "supabase_intelligent_selection"
+      }
+    ],
+    "wsdl_files": [
+      {
+        "file_name": "successfactors_employee_service.wsdl",
+        "description": "SuccessFactors Employee Service WSDL definition",
+        "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<definitions xmlns=\"http://schemas.xmlsoap.org/wsdl/\" targetNamespace=\"http://successfactors.com/employee\">\n    <types>\n        <schema xmlns=\"http://www.w3.org/2001/XMLSchema\" targetNamespace=\"http://successfactors.com/employee\">\n            <element name=\"Employee\">\n                <complexType>\n                    <sequence>\n                        <element name=\"externalCode\" type=\"string\"/>\n                        <element name=\"firstName\" type=\"string\"/>\n                        <element name=\"lastName\" type=\"string\"/>\n                    </sequence>\n                </complexType>\n            </element>\n        </schema>\n    </types>\n</definitions>",
+        "relevance_score": 0.82,
+        "source": "supabase_intelligent_selection"
+      }
+    ],
+    "configuration_files": [
+      {
+        "file_name": "parameters.properties",
+        "description": "Integration parameters and configuration",
+        "content": "# Employee Integration Parameters\nS4HANA_BASE_URL={{S4HANA_ENDPOINT}}\nSUCCESSFACTORS_BASE_URL={{SF_ENDPOINT}}\nBATCH_SIZE=100\nRETRY_COUNT=3\nTIMEOUT_SECONDS=30",
+        "relevance_score": 0.75,
+        "source": "supabase_intelligent_selection",
+        "config_type": "parameters"
+      }
+    ],
+    "other_resources": []
+  },
+  "generation_metadata": {
+    "generation_timestamp": "2025-01-20 14:30:45",
+    "processing_time_seconds": 3.47,
+    "query_confidence": 0.87,
+    "selection_confidence": 0.91,
+    "total_components": 5,
+    "total_assets": 4,
+    "integration_pattern": "sync",
+    "complexity_level": "medium",
+    "essential_components": 3,
+    "component_types_covered": ["contentmodifier", "script", "requestreply", "messagemapping", "exclusivegateway"],
+    "asset_types_covered": ["groovy", "mmap", "wsdl", "properties"],
+    "requirement_coverage": {
+      "covered_components": ["enricher", "script", "request_reply", "message_mapping"],
+      "missing_components": [],
+      "coverage_percentage": 100.0,
+      "has_essential_components": true,
+      "component_diversity": 5
+    },
+    "source_packages": ["pkg_12345", "pkg_67890"],
+    "generator_version": "2.0",
+    "intelligence_level": "enhanced"
+  },
+  "user_query": "Create a sync integration to transfer employee data from SAP S/4HANA to SuccessFactors with validation and error handling",
+  "blueprint_version": "2.0",
+  "generator_type": "enhanced_intelligent"
+}
