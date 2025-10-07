@@ -1,0 +1,305 @@
+{
+  "name": "Iflow Ingestion pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Iflow Ingestion",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload Iflow Package",
+              "fieldType": "file",
+              "acceptFileTypes": ".zip"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        80
+      ],
+      "id": "f7be07e7-7507-4a51-a7bb-8f2e0c611297",
+      "name": "On form submission",
+      "webhookId": "cf837213-3ecd-426e-a324-6bb9358b9310"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=Upload_Iflow_Package",
+        "name": "={{$json[\"filename\"]}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1xSY9yJTXHQvYlmV8QCXWL4kWFacRal_o",
+          "mode": "list",
+          "cachedResultName": "Ingestion Iflow Package",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1xSY9yJTXHQvYlmV8QCXWL4kWFacRal_o"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        672,
+        80
+      ],
+      "id": "bb8fdf84-f2b1-496b-b1ab-1be9aa28d574",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ou9AmZ6HtNWOqp9U",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1xSY9yJTXHQvYlmV8QCXWL4kWFacRal_o",
+          "mode": "list",
+          "cachedResultName": "Ingestion Iflow Package",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1xSY9yJTXHQvYlmV8QCXWL4kWFacRal_o"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -224
+      ],
+      "id": "df617c7c-afe3-4e68-9940-f355c9db3c57",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ou9AmZ6HtNWOqp9U",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json[\"id\"]}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        -224
+      ],
+      "id": "71f3a66b-3728-4547-a0bf-388da9a25994",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ou9AmZ6HtNWOqp9U",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['Upload Iflow Package']",
+        "options": {
+          "includeBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        80
+      ],
+      "id": "812a0021-d227-4c20-b7f5-12488ab1d7e1",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  if(item.binary){\n    // rename first binary field to Upload_Iflow_Package\n    const binFieldName = Object.keys(item.binary)[0];\n    item.binary['Upload_Iflow_Package'] = item.binary[binFieldName];\n    if(binFieldName !== 'Upload_Iflow_Package'){\n      delete item.binary[binFieldName]; // optional\n    }\n  }\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        80
+      ],
+      "id": "a4179ce3-01a1-46b0-b8a0-8fe8e089bd4c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://iflow-processor-api.cfapps.us10-001.hana.ondemand.com/process-iflow",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "=Content-Type",
+              "value": "application/zip"
+            },
+            {
+              "name": "X-Filename",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "timeout": 1000000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -144
+      ],
+      "id": "7b456a2f-1dbc-4bbb-b79d-ef07c1149668",
+      "name": "HTTP Request VD"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://web-production-4250.up.railway.app/n8n/upload",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -320
+      ],
+      "id": "3122e94d-aac4-4ba9-9d22-e4e69b22b53f",
+      "name": "HTTP Request KG"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request VD",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request KG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3b06de8b-269a-49a2-89a4-0b8670ca71a9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "017ce62c773f5f1f36ef1302f3266b42bcebc30f930e68afc55fa9e0ce517a72"
+  },
+  "id": "FEcnBkUz0qKznwIO",
+  "tags": [
+    {
+      "createdAt": "2025-09-11T07:06:14.435Z",
+      "updatedAt": "2025-09-11T07:06:14.435Z",
+      "id": "CsaOlu0Hz1MRLyTP",
+      "name": "SAP iFlow"
+    },
+    {
+      "createdAt": "2025-09-15T12:51:04.187Z",
+      "updatedAt": "2025-09-15T12:51:04.187Z",
+      "id": "k6SxLi7xyZyBQDZA",
+      "name": "Data Processing"
+    },
+    {
+      "createdAt": "2025-09-15T12:51:04.165Z",
+      "updatedAt": "2025-09-15T12:51:04.165Z",
+      "id": "xjmaMiwY0XVujMF3",
+      "name": "Supabase"
+    }
+  ]
+}
