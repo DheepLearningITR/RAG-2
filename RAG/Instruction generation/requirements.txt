@@ -1,0 +1,15 @@
+# RAG Prime Instruction Generation Dependencies
+
+# OpenAI for embeddings
+openai>=1.0.0
+
+# Supabase for database operations
+supabase>=2.0.0
+
+# Additional dependencies that might be needed
+python-dotenv>=1.0.0
+requests>=2.31.0
+numpy>=1.24.0
+
+# Optional: For better logging and debugging
+colorlog>=6.7.0
