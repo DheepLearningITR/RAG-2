@@ -1,15 +1,13 @@
-# Environment Variables and Secrets
+# Environment variables and secrets
 .env
 .env.local
 .env.production
 .env.staging
-*.env
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyc
 *.so
 .Python
 build/
@@ -35,7 +33,6 @@ env/
 ENV/
 env.bak/
 venv.bak/
-.venv/
 
 # IDE
 .vscode/
@@ -56,7 +53,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
-log/
 
 # Temporary files
 *.tmp
@@ -64,17 +60,25 @@ log/
 temp/
 tmp/
 
-# Output files
-output/
-Output json/
+# Uploaded files and processing artifacts
+uploads/
+chunks_*.json
 *.zip
-*.tar.gz
-*.rar
+*.iflw
 
-# Database files
+# Database
 *.db
 *.sqlite
 *.sqlite3
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -109,42 +113,3 @@ celerybeat.pid
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# Cloud Foundry
-.cfignore
-
-# SAP iFlow specific
-*.iflw
-*.mmap
-*.wsdl
-*.xsd
-*.groovy
-*.gsh
-*.properties
-*.prop
-*.propdef
-*.xsl
-*.xslt
-
-# Generated chunks and analysis files
-*_chunks.json
-enhanced_iflow_chunks.json
-clean_iflow_chunks.json
-chunks_*.json
-blueprint_*.json
-
-# API Keys and sensitive data patterns
-*api_key*
-*secret*
-*password*
-*token*
-*credential*
-
-# Neo4j
-*.neo4j
-
-# Supabase
-.supabase/
